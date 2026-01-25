@@ -3,9 +3,8 @@ VBA Macros to Save most current Conditional Format Rules as plain, human-readabl
 
 ## Updates:
 
-Updated Jan 24 2026 - Clean up & condense code, normalize string variables, fix bug in font color, deeper dive into borders.
-
-Updated Jan 23 2026 - Added a lot more capability, moved utility functions to a separate module.
+-   Updated Jan 24 2026 - Clean up & condense code, normalize string variables, fix bug in font color, deeper dive into borders.
+-   Updated Jan 23 2026 - Added a lot more capability, moved utility functions to a separate module.
 
 ## About:
 
@@ -65,4 +64,4 @@ Condition Types Not Yet Tested (thus, perhaps not handled):
 
 ## Test Case:
 
-In my repository there is a file called Test Case which is a recent copy of the saved rules (from my WatchedHistory tv/movie bingeing spreadsheet). The rules are mostly arbitrary – I just wanted to have a test case with a lot of different rules.
+In my repository there is a file called TestCase.txt which is a recent copy of the saved rules (from my WatchedHistory tv/movie bingeing spreadsheet). The rules are mostly arbitrary – I just wanted to have a test case with a lot of different rules.
