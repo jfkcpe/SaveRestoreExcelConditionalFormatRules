@@ -1,16 +1,153 @@
-16 Conditional Formatting Rules for tab: "WatchHistory" Saved on 01/25/2026 15:21:57
+19 Conditional Formatting Rules for tab: "WatchHistory" Saved on 01/30/2026 15:09:55
 
 Rule #1:
-  Applies To: $AF$3
-  Type ID: xlCellValue
-  Operator: xlEqual
-  Formula 1: =5
-  FontColor: 255
-  Borders.Color 4: 255
-  Borders.LineStyle 4: 1
-  Borders.Weight 4: 2
+Column(s) Affected: m/s
+  Applies To: $A$3
+  Type ID: xlNoErrorsCondition
+  StopIfTrue: True
+  Formula 1: =NOT(ISERROR(A3))
+  FillColor: 65280
+  FontColor: 12611584
+  StopIfTrue: True
 
 Rule #2:
+Column(s) Affected: m/s
+  Applies To: $A$2
+  Type ID: xlErrorsCondition
+  Formula 1: =ISERROR(A2)
+  FillColor: 254
+  FontColor: 65535
+
+Rule #3:
+Column(s) Affected: m/s
+  Applies To: $A$7
+  Type ID: xlCellValue
+  Operator: xlEqual
+  Formula 1: ="m"
+  FontColor: 255
+  Borders.Color 4: 255
+  Borders.LineStyle 4: xlDashDotDot
+
+Rule #4:
+Column(s) Affected: Name
+  Applies To: $B:$B
+  Type ID: xlExpression
+  Formula 1: =AND(B1<>"",O1="")
+  FillColor: 65535
+
+Rule #5:
+Column(s) Affected: Name
+  Applies To: $B$2:$B$1048576
+  Type ID: xlExpression
+  Formula 1: =AND(B2<>"",B2=B3)
+  FillColor: 16313082
+  FontColor: 3305961
+
+Rule #6:
+Column(s) Affected: F
+  Applies To: $C$3
+  Type ID: xlCellValue
+  Operator: xlBetween
+  Formula 1: =1
+  Formula 2: =5
+  FillColor: 13463000
+  FontColor: 65535
+
+Rule #7:
+Column(s) Affected: R
+  Applies To: $E:$E
+  Type ID: xlColorScale
+  ColorScaleType: 3
+  ColorScaleCriteriaType 1: xlConditionalValuePercentile
+  ScaleColor 1: 14803455
+  ColorScaleCriteriaValue 1: 9
+  ColorScaleCriteriaType 2: xlConditionalValuePercentile
+  ScaleColor 2: 14811105
+  ColorScaleCriteriaValue 2: 50
+  ColorScaleCriteriaType 3: xlConditionalValuePercentile
+  ScaleColor 3: 16769505
+  ColorScaleCriteriaValue 3: 91
+
+Rule #8:
+Column(s) Affected: Start Year
+  Applies To: $H:$H
+  Type ID: xlIconSet
+  IconSet_ID: xl4CRV
+  IconCriteria(1)_Type: xlConditionValuePercent
+  IconCriteria(1)_Value: 0
+  IconCriteria(1)_Operator: xlGreaterEqual
+  IconCriteria(2)_Type: xlConditionValuePercent
+  IconCriteria(2)_Value: 25
+  IconCriteria(2)_Operator: xlGreaterEqual
+  IconCriteria(3)_Type: xlConditionValuePercent
+  IconCriteria(3)_Value: 50
+  IconCriteria(3)_Operator: xlGreaterEqual
+  IconCriteria(4)_Type: xlConditionValuePercent
+  IconCriteria(4)_Value: 75
+  IconCriteria(4)_Operator: xlGreaterEqual
+
+Rule #9:
+Column(s) Affected: Category
+  Applies To: $K:$K
+  Type ID: xlTextString
+  TextOperator: xlContains
+  Text: WWII
+  Formula 1: =NOT(ISERROR(SEARCH("WWII",K1)))
+  FillColor: 15716082
+  FontColor: 7348600
+
+Rule #10:
+Column(s) Affected: Category
+  Applies To: $K:$K
+  Type ID: xlBlanksCondition
+  Formula 1: =LEN(TRIM(K1))=0
+  FillColor: 16510410
+
+Rule #11:
+Column(s) Affected: Have DVD
+  Applies To: $L$2:$L$1048576
+  Type ID: xlNoBlanksCondition
+  Formula 1: =LEN(TRIM(L2))>0
+  FillColor: 16765424
+
+Rule #12:
+Column(s) Affected: IMDB ID
+  Applies To: $O$2:$O$1048576
+  Type ID: xlExpression
+  Formula 1: =OR(O2=O1,O2=O3)
+  FillColor: 14548991
+  FontColor: 138
+
+Rule #13:
+Column(s) Affected: Title
+  Applies To: $S:$S
+  Type ID: xlTextString
+  TextOperator: xlBeginsWith
+  Text: the
+  Formula 1: =LEFT(S1,LEN("the"))="the"
+  FillColor: 13693658
+
+Rule #14:
+Column(s) Affected: Title
+  Applies To: $S:$S
+  Type ID: xlUniqueValues
+  DupeUnique: 1
+  FillColor: 13463000
+  FontColor: 65535
+  Borders.Color 5: 0
+  Borders.Color 6: 0
+
+Rule #15:
+Column(s) Affected: Title
+  Applies To: $S:$S
+  Type ID: xlTextString
+  TextOperator: xlEndsWith
+  Text: n
+  Formula 1: =RIGHT(S1,LEN("n"))="n"
+  FillColor: 16510410
+
+Rule #16:
+Column(s) Affected: imdbRating
   Applies To: $T:$T
   Type ID: xlTop10
   TopBottom: 1
@@ -20,115 +157,32 @@ Rule #2:
   Borders.Color 5: 0
   Borders.Color 6: 0
 
-Rule #3:
+Rule #17:
+Column(s) Affected: Metascore
+  Applies To: $U$2:$U$1048576
+  Type ID: xlColorScale
+  ColorScaleType: 2
+  ColorScaleCriteriaType 1: xlConditionalValueLowestValue
+  ScaleColor 1: 13158655
+  ColorScaleCriteriaValue 1: 1.7
+  ColorScaleCriteriaType 2: xlConditionalValueHighestValue
+  ScaleColor 2: 13172680
+  ColorScaleCriteriaValue 2: 10
+
+Rule #18:
+Column(s) Affected: Rated
+  Applies To: $X:$X
+  Type ID: xlTextString
+  TextOperator: xlDoesNotContain
+  Text: t
+  Formula 1: =ISERROR(SEARCH("t",X1))
+  FillColor: 13693658
+
+Rule #19:
+Column(s) Affected: Updated
   Applies To: $AH:$AH
   Type ID: xlTimePeriod
   DateOperator: xlLastWeek
   Formula 1: =AND(TODAY()-FLOOR(AH1,1)<=6,FLOOR(AH1,1)<=TODAY())
   FillColor: 13168833
-
-Rule #4:
-  Applies To: $M:$M
-  Type ID: xlNoBlanksCondition
-  Formula 1: =LEN(TRIM(M1))>0
-  FillColor: 6750054
-
-Rule #5:
-  Applies To: $K:$K
-  Type ID: xlBlanksCondition
-  Formula 1: =LEN(TRIM(K1))=0
-  FillColor: 16510410
-
-Rule #6:
-  Applies To: $X:$X
-  Type ID: xlTextString
-  TextOperator: xlDoesNotContain
-  Text: R
-  Formula 1: =ISERROR(SEARCH("R",X1))
-  FillColor: 13693658
-
-Rule #7:
-  Applies To: $S:$S
-  Type ID: xlTextString
-  TextOperator: xlEndsWith
-  Text: n
-  Formula 1: =RIGHT(S1,LEN("n"))="n"
-  FillColor: 16510410
-
-Rule #8:
-  Applies To: $S:$S
-  Type ID: xlTextString
-  TextOperator: xlBeginsWith
-  Text: the
-  Formula 1: =LEFT(S1,LEN("the"))="the"
-  FillColor: 13693658
-
-Rule #9:
-  Applies To: $K:$K
-  Type ID: xlTextString
-  TextOperator: xlContains
-  Text: WWII
-  Formula 1: =NOT(ISERROR(SEARCH("WWII",K1)))
-  FillColor: 15716082
-  FontColor: 16773074
-
-Rule #10:
-  Applies To: $S:$S
-  Type ID: xlUniqueValues
-  DupeUnique: 1
-  FillColor: 13463000
-  FontColor: 65535
-  Borders.Color 5: 0
-  Borders.Color 6: 0
-
-Rule #11:
-  Applies To: $C$3
-  Type ID: xlCellValue
-  Operator: xlBetween
-  Formula 1: =1
-  Formula 2: =5
-  FillColor: 13463000
-  FontColor: 65535
-
-Rule #12:
-  Applies To: $U$2:$U$9999
-  Type ID: xlColorScale
-  ColorScaleType: 2
-  ColorScaleCriteriaType 1: xlConditionalValueLowestValue
-  ScaleColor 1: 2650623
-  ScaleTintShade 1: 0
-  ColorScaleCriteriaType 2: xlConditionalValueHighestValue
-  ScaleColor 2: 5296274
-  ScaleTintShade 2: 0
-
-Rule #13:
-  Applies To: $E$2:$E$9999
-  Type ID: xlColorScale
-  ColorScaleType: 2
-  ColorScaleCriteriaType 1: xlConditionalValueLowestValue
-  ScaleColor 1: 2650623
-  ScaleTintShade 1: 0
-  ColorScaleCriteriaType 2: xlConditionalValueHighestValue
-  ScaleColor 2: 10285055
-  ScaleTintShade 2: 0
-
-Rule #14:
-  Applies To: $O$2:$O$9999
-  Type ID: xlExpression
-  Formula 1: =OR(O2=O1,O2=O3)
-  FillColor: 14548991
-  FontColor: 138
-
-Rule #15:
-  Applies To: $B$2:$B$9999
-  Type ID: xlExpression
-  Formula 1: =AND(B2<>"",B2=B3)
-  FillColor: 16313082
-  FontColor: 16773074
-
-Rule #16:
-  Applies To: $B:$B
-  Type ID: xlExpression
-  Formula 1: =AND(B1<>"",O1="")
-  FillColor: 65535
 
