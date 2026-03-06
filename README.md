@@ -62,3 +62,7 @@ So far, limited testing indicates successful handling of condition types:
 ## Test Case:
 
 In my repository there is a file called TestCase.txt which is a recent copy of the saved rules (from my WatchedHistory tv/movie bingeing spreadsheet). The rules are mostly arbitrary and some are weird – I just wanted to have a test case with a lot of different rules.
+
+## Tips:
+
+1.  If you plan to move columns around, do yourself a favor: make sure you have a clean set of rules (i.e., run the Restore subroutine).  Then move your columns around - this will automatically update all your rules about those columns, then run the Save subroutine to create a clean, updated set of rules with appropriately updated column references.
