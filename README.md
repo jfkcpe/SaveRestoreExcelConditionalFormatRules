@@ -3,6 +3,8 @@ VBA Macros to Save most current Conditional Format Rules as plain, human-readabl
 
 ## Updates:
 
+-   Updated Mar 16 2026 - ver 0.5
+    -   Added a notation to each saved rule showing which columns were affected and which were examined (e.g. in forumulas) showing both column letter and column header name (in case your saved rules get out of sync - see Tips #1 below.)
 -   Updated Jan 30 2026 – ver 0.4
     -   Merged the “Util” module of utility/helper functions back into the main SaveRestore.bas file, so you won’t see any reference to the SaveRestoreUtil.bas file anymore.
     -   Add “Column(s) Affected:” string showing column header for each Rule in saved string
@@ -30,7 +32,7 @@ The Recreate subroutine will read that string and attempt to recreate all the ru
 
 I am not a developer and this is not efficient or elegant code. It enumerates each and every parameter that I deduced would be useful through trial-and-error combined with debugging and inspection of the Excel Object Model (and we are, no doubt, missing some options).
 
-I suppose I could have written (or obtained) some code to programmatically and exhaustively render each ConditionalFormattingRule as some kind of hierarchical, plain-text listing (perhaps JSON?) with all the parameters (including many potentially unnecessary ones) and then rebuild the Object during Recreate. But, I wanted the saved string to be uncluttered and easy to read and understand (and edit, if the spirit moves you). I also enjoyed the rather exhausting project of unpacking and trying to understand the small portion of the CF Rules that I managed to handle.
+I suppose I could have written (or obtained) some code to programmatically and exhaustively render each ConditionalFormattingRule as some kind of hierarchical, plain-text listing (perhaps JSON?) with all the parameters (including many potentially unnecessary ones) and then rebuild the Object during Recreate. But, I wanted the saved string to be uncluttered and easy to read and understand (and edit, if the spirit moves you). I also enjoyed the rather exhausting project of unpacking and trying to understand the CF Rules that I managed to handle.
 
 ## Limitations:
 
@@ -43,7 +45,7 @@ Formats Not Yet Handled: Fill Patterns,
 So far, limited testing indicates successful handling of condition types:
 
 -   xlExpression
--   xlCellValue (Operators: xlBetween, xlNotBetween, xlEqual,)
+-   xlCellValue (Operators: xlBetween, xlNotBetween, xlEqual)
 -   xlUniqueValues (including DupeUnique or "Duplicates")
 -   xlTextString (TextOperators: xlContains, xlDoesNotContain, xlBeginsWith, xlEndsWith)
 -   xlColorScale (2 & 3 colors), xlTimePeriod (all DateOperators – like xlLastWeek - probably)
@@ -56,8 +58,8 @@ So far, limited testing indicates successful handling of condition types:
 1.  To Install, go to Developer -\> Visual Basic. Right click on Left Nav “Modules” and select “Import File”. Do that for file: “SaveRestore.bas”
 2.  Let’s say you want to save and later recreate Conditional Formatting Rules for your tab “MyData”, do this: Somewhere on your workbook (possibly on a “Readme” or “Misc” tab) select a cell and give it a range name (try clicking in the pull-down just under the left side of the menu bar and type the name).  
     The name should be in the form \<TabName\>_CF_RULES. An example would be: MyData_CF_RULES
-3.  If you also want your saved Rules to show which columns (by the name you give them in the header row) are affected by each Rule, select the header row in your spreadsheet and give a range name in the form \<TabName\>_CF_hdrRow, for example MyDate_CF_hdrRow.
-4.  Go to your data worksheet. On menu tab Developer click “Macros” and select SaveConditionalFormattingToString to test out the save function.
+3.  If you also want your saved Rules to show which columns (by the name you give them in the header row) are affected by each Rule, select the header row in your spreadsheet and give a range name in the form \<TabName\>_CF_hdrRow, for example MyData_CF_hdrRow.
+4.  Go to your data worksheet. On menu tab Developer click “Macros” and select and Run "SaveConditionalFormattingToString" to test out the save function.  Then do the same with macro "RecreateConditionalFormattingFromString".
 
 ## Test Case:
 
@@ -65,4 +67,4 @@ In my repository there is a file called TestCase.txt which is a recent copy of t
 
 ## Tips:
 
-1.  If you plan to move columns around, do yourself a favor: make sure you have a clean set of rules (i.e., run the Restore subroutine).  Then move your columns around - this will automatically update all your rules about those columns, then run the Save subroutine to create a clean, updated set of rules with appropriately updated column references.
+1.  If you plan to move columns around, do yourself a favor: make sure you have a clean set of rules (i.e., run the Restore subroutine).  Then move your columns around - this will automatically update all your rules about those columns, then run the Save subroutine to create a clean, updated set of rules with appropriately updated column references.  (BTW: In case you forget to do this: Starting with version 0.5, the saved rules will have a notation about which affected column letters were associated with which column header names.)
