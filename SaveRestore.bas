@@ -1,5 +1,5 @@
 Attribute VB_Name = "SaveRestore"
-' Save and Restore Conditional Formatting Rules - Version 0.5 - Mar 16 2026
+' Save and Restore Conditional Formatting Rules - Version 0.5b - Mar 16 2026
 ' Copyright (c) 2026 jfkcpe.  Governed by an MIT license.  See https://github.com/jfkcpe/SaveRestoreExcelConditionalFormatRules
 ' Use at your own risk - see license.
 
@@ -77,9 +77,9 @@ Sub SaveConditionalFormattingToString()
             If Not IsEmpty(cf.TextOperator) Then tmpRules = tmpRules & "  TextOperator: " & TxtOpIntToString(cf.TextOperator) & vbCrLf
             If Not IsEmpty(cf.DateOperator) Then tmpRules = tmpRules & "  DateOperator: " & DateOpIntToString(cf.DateOperator) & vbCrLf
             If Not IsEmpty(cf.Text) Then tmpRules = tmpRules & "  Text: " & cf.Text & vbCrLf
-            If Not IsEmpty(cf.formula1) Then
-                tmpRules = tmpRules & "  Formula 1: " & cf.formula1 & vbCrLf
-                tmpCols = cf.formula1
+            If Not IsEmpty(cf.Formula1) Then
+                tmpRules = tmpRules & "  Formula 1: " & cf.Formula1 & vbCrLf
+                tmpCols = cf.Formula1
             End If
             If Not IsEmpty(cf.Formula2) Then
                 tmpRules = tmpRules & "  Formula 2: " & cf.Formula2 & vbCrLf
@@ -219,7 +219,7 @@ Sub RecreateConditionalFormattingFromString()
         iRule = Replace(iRule, vbCr, "|")
         iRule = iRule & "|"
         
-        stTrgRange = ParseMyParm(iRule, "Applies To") ' Always present
+        stTrgRange = ParseMyParm(iRule, "Applies To Address") ' Always present
         stType = ParseMyParm(iRule, "Type ID"): intType = TypeStringToInt(stType) ' Always present
         
         stOperator = ParseMyParm(iRule, "Operator"): If stOperator <> "" Then intOperator = OpStringToInt(stOperator)
@@ -252,6 +252,7 @@ Sub RecreateConditionalFormattingFromString()
         Next j
         
         stIconSetID = ParseMyParm(iRule, "IconSet_ID")
+        stReverseOrder = ParseMyParm(iRule, "ReverseOrder")
         stShowIconOnly = ParseMyParm(iRule, "ShowIconOnly")
         
         For j = 1 To 5 ' I think 5 is the max number of iconcriteria
@@ -262,7 +263,7 @@ Sub RecreateConditionalFormattingFromString()
         
         stStopIfTrue = ParseMyParm(iRule, "StopIfTrue"): boolStopIfTrue = IIf(stStopIfTrue = "True", True, False) ' IIf, a nice compact alternative to If Then Else!
         
-        On Error Resume Next ' Comment this line out if you are debugging.
+        'On Error Resume Next ' Comment this line out if you are debugging.
         
         doFontsBorders = True
         
@@ -293,12 +294,20 @@ Sub RecreateConditionalFormattingFromString()
         ElseIf intType = 6 Then
             Set cf = ws.Range(stTrgRange).FormatConditions.AddIconSetCondition
             cf.IconSet = ActiveWorkbook.IconSets(IconSetStringToInt(stIconSetID))
-            cf.ReverseOrder = CBool(stReverseOrder)
-            cf.ShowIconOnly = CBool(stShowIconOnly)
-            For j = 2 To 5
-                cf.IconCriteria.item(j).Type = CDbl(arrstIconSetType(j))
+            If Len(stReverseOrder) > 0 Then
+                cf.ReverseOrder = CBool(stReverseOrder)
+            Else
+                cf.ReverseOrder = False
+            End If
+            If Len(stShowIconOnly) > 0 Then
+                cf.ShowIconOnly = CBool(stShowIconOnly)
+            Else
+                cf.ShowIconOnly = False
+            End If
+            For j = 2 To cf.IconCriteria.Count ' starts at 2 because you skip 1 because the first icon is rectricted and it's type cannot be changed from the default "lowest value"
+                cf.IconCriteria.item(j).Type = CondValTypeStringToInt(arrstIconSetType(j)) ' was CDbl(arrstIconSetType(j))
                 cf.IconCriteria.item(j).Value = CDbl(arrstIconSetValue(j))
-                cf.IconCriteria.item(j).Operator = CDbl(arrstIconSetOperator(j))
+                cf.IconCriteria.item(j).Operator = OpStringToInt(arrstIconSetOperator(j)) ' was CDbl(arrstIconSetOperator(j))
             Next j
             doFontsBorders = False
         
@@ -307,11 +316,16 @@ Sub RecreateConditionalFormattingFromString()
         ElseIf stText <> "" And intType = xlTextString Then
             Set cf = ws.Range(stTrgRange).FormatConditions.Add(Type:=xlTextString, String:=stText)
         ElseIf stOperator <> "" Then
-            Set cf = ws.Range(stTrgRange).FormatConditions.Add(Type:=intType, Operator:=intOperator, formula1:=stFormula1, Formula2:=stFormula2)
+            Set cf = ws.Range(stTrgRange).FormatConditions.Add(Type:=intType, Operator:=intOperator, Formula1:=stFormula1, Formula2:=stFormula2)
 
-
+        ElseIf intType = 10 Then
+            Set cf = ws.Range(stTrgRange).FormatConditions.Add(Type:=intType) ' Excel creates a formula1 like "=LEN(TRIM(C2))=0" in ADDITION to intType 10.  That formula1 must not be used!
         Else
-            Set cf = ws.Range(stTrgRange).FormatConditions.Add(Type:=intType, formula1:=stFormula1, Formula2:=stFormula2)
+            If stFormula2 <> "" Then
+                Set cf = ws.Range(stTrgRange).FormatConditions.Add(Type:=intType, Formula1:=stFormula1, Formula2:=stFormula2)
+            Else
+                Set cf = ws.Range(stTrgRange).FormatConditions.Add(Type:=intType, Formula1:=stFormula1)
+            End If
         End If
         
         If doFontsBorders Then
@@ -644,20 +658,20 @@ Function CondValTypeIntToString(intTest As Long) As String
   End Select
 End Function
 
-'Function CondValTypeStringToInt(stTest As String) As Long ' Not used
-'  Select Case stTest
-'    Case "xlConditionValueAutomaticMax": CondValTypeStringToInt = 7
-'    Case "xlConditionValueAutomaticMin": CondValTypeStringToInt = 6
-'    Case "xlConditionValueFormula": CondValTypeStringToInt = 4
-'    Case "xlConditionValueHighestValue": CondValTypeStringToInt = 2
-'    Case "xlConditionValueLowestValue": CondValTypeStringToInt = 1
-'    Case "xlConditionValueNone": CondValTypeStringToInt = -1
-'    Case "xlConditionValueNumber": CondValTypeStringToInt = 0
-'    Case "xlConditionValuePercent": CondValTypeStringToInt = 3
-'    Case "xlConditionValuePercentile": CondValTypeStringToInt = 5
-'    Case Else: CondValTypeStringToInt = -9999
-'  End Select
-'End Function
+Function CondValTypeStringToInt(stTest As String) As Long ' Not used
+  Select Case stTest
+    Case "xlConditionValueAutomaticMax": CondValTypeStringToInt = 7
+    Case "xlConditionValueAutomaticMin": CondValTypeStringToInt = 6
+    Case "xlConditionValueFormula": CondValTypeStringToInt = 4
+    Case "xlConditionValueHighestValue": CondValTypeStringToInt = 2
+    Case "xlConditionValueLowestValue": CondValTypeStringToInt = 1
+    Case "xlConditionValueNone": CondValTypeStringToInt = -1
+    Case "xlConditionValueNumber": CondValTypeStringToInt = 0
+    Case "xlConditionValuePercent": CondValTypeStringToInt = 3
+    Case "xlConditionValuePercentile": CondValTypeStringToInt = 5
+    Case Else: CondValTypeStringToInt = -9999
+  End Select
+End Function
 
 Function IconSetIntToString(intTest As Long) As String
   Select Case intTest
