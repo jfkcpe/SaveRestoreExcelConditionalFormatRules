@@ -3,8 +3,9 @@ VBA Macros to Save most current Conditional Format Rules as plain, human-readabl
 
 ## Updates:
 
--   Updated Mar 16 2026 - ver 0.5
+-   Updated Mar 16 2026 - ver 0.5 & 0.5b
     -   Added a notation to each saved rule showing which columns were affected and which were examined (e.g. in forumulas) showing both column letter and column header name (in case your saved rules get out of sync - see Tips #1 below.)
+    -   Debugging of that new feature, plus fixed some errors in xlIconSet handling.
 -   Updated Jan 30 2026 – ver 0.4
     -   Merged the “Util” module of utility/helper functions back into the main SaveRestore.bas file, so you won’t see any reference to the SaveRestoreUtil.bas file anymore.
     -   Add “Column(s) Affected:” string showing column header for each Rule in saved string
