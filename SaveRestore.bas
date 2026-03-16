@@ -1,12 +1,12 @@
 Attribute VB_Name = "SaveRestore"
-' Save and Restore Conditional Formatting Rules - Version 0.4 - Jan 30 2026
+' Save and Restore Conditional Formatting Rules - Version 0.5 - Mar 16 2026
 ' Copyright (c) 2026 jfkcpe.  Governed by an MIT license.  See https://github.com/jfkcpe/SaveRestoreExcelConditionalFormatRules
 ' Use at your own risk - see license.
 
 Sub SaveConditionalFormattingToString()
     Dim ws As Worksheet
     Dim cf As Object
-    Dim allRules As String
+    Dim allRules As String, tmpRules As String, tmpCols As String, tmpColsArr() As String, tmpCol As Variant
     Dim ruleCount As Long, intType As Long, i As Long
     Dim allColumns As String, rngHdrName As String, intCol As Variant, stTmp As String
     
@@ -28,7 +28,7 @@ Sub SaveConditionalFormattingToString()
     
     rngHdrName = ws.Name & "_hdrRow"
     If RangeExists(rngHdrName) Then
-        intHdrRow = Range(rngHdrName).Row
+        intHdrRow = Range(rngHdrName).row
     Else
         intHdrRow = 0
     End If
@@ -39,68 +39,65 @@ Sub SaveConditionalFormattingToString()
     For Each cf In ws.Cells.FormatConditions
         ' For this conditional format, render out ever conceivably relevant non-null parameter we think will be needed to re-establish the rule
         ruleCount = ruleCount + 1
-        allRules = allRules & "Rule #" & ruleCount & ":" & vbCrLf
-        If intHdrRow > 0 Then
-            allColumns = "Column(s) Affected:"
-            For Each intCol In cf.AppliesTo.Columns
-                stTmp = Cells(intHdrRow, intCol.Column).Value
-                If InStr(1, allColumns, " " & stTmp & ",") = 0 Then
-                    allColumns = allColumns & " " & Cells(intHdrRow, intCol.Column).Value & ","
-                End If
-            Next intCol
-            allRules = allRules & Left(allColumns, Len(allColumns) - 1) & vbCrLf
-        End If
-        allRules = allRules & "  Applies To: " & cf.AppliesTo.Address & vbCrLf
-        allRules = allRules & "  Type ID: " & TypeIntToString(cf.Type) & vbCrLf
         intType = cf.Type
+        tmpRules = ""
+        tmpCols = ""
               
         On Error Resume Next ' There WILL be "errors" and there's no elegant way to pre-determine if a condition index (like cf.dupeUnique) exists before accessing it.  Sigh.
        
         If intType = xlColorScale Then ' I believe ColorScale only has these variables
             If Not IsEmpty(cf.ColorScaleCriteria) Then
-                allRules = allRules & "  ColorScaleType: " & cf.ColorScaleCriteria.Count & vbCrLf
+                tmpRules = tmpRules & "  ColorScaleType: " & cf.ColorScaleCriteria.Count & vbCrLf
                 For i = 1 To cf.ColorScaleCriteria.Count
                     With cf.ColorScaleCriteria(i)
-                        allRules = allRules & "  ColorScaleCriteriaType " & i & ": " & CritTypeIntToString(.Type) & vbCrLf
-                        allRules = allRules & "  ScaleColor " & i & ": " & .FormatColor.Color & vbCrLf
-                        'If .FormatColor.TintAndShade <> 0 Then allRules = allRules & "  ScaleTintShade " & i & ": " & .FormatColor.TintAndShade & vbCrLf
-                        allRules = allRules & "  ColorScaleCriteriaValue " & i & ": " & .Value & vbCrLf
+                        tmpRules = tmpRules & "  ColorScaleCriteriaType " & i & ": " & CritTypeIntToString(.Type) & vbCrLf
+                        tmpRules = tmpRules & "  ScaleColor " & i & ": " & .FormatColor.Color & vbCrLf
+                        'If .FormatColor.TintAndShade <> 0 Then tmpRules = tmpRules & "  ScaleTintShade " & i & ": " & .FormatColor.TintAndShade & vbCrLf
+                        tmpRules = tmpRules & "  ColorScaleCriteriaValue " & i & ": " & .Value & vbCrLf
                     End With
                 Next i
             End If
         ElseIf intType = xlIconSets Then ' I believe IconSet only has these variables
-            allRules = allRules & "  IconSet_ID: " & IconSetIntToString(cf.IconSet.ID) & vbCrLf
-            If cf.ReverseOrder <> "" And cf.ReverseOrder <> False Then allRules = allRules & "  ReverseOrder: " & cf.ReverseOrder & vbCrLf
-            If cf.ShowIconOnly <> "" And cf.ShowIconOnly <> False Then allRules = allRules & "  ShowIconOnly: " & cf.ShowIconOnly & vbCrLf
+            tmpRules = tmpRules & "  IconSet_ID: " & IconSetIntToString(cf.IconSet.ID) & vbCrLf
+            If cf.ReverseOrder <> "" And cf.ReverseOrder <> False Then tmpRules = tmpRules & "  ReverseOrder: " & cf.ReverseOrder & vbCrLf
+            If cf.ShowIconOnly <> "" And cf.ShowIconOnly <> False Then tmpRules = tmpRules & "  ShowIconOnly: " & cf.ShowIconOnly & vbCrLf
             For i = 1 To cf.IconCriteria.Count
-                allRules = allRules & "  IconCriteria(" & i & ")_Type: " & CondValTypeIntToString(cf.IconCriteria(i).Type) & vbCrLf
-                allRules = allRules & "  IconCriteria(" & i & ")_Value: " & cf.IconCriteria(i).Value & vbCrLf
-                allRules = allRules & "  IconCriteria(" & i & ")_Operator: " & OpIntToString(cf.IconCriteria(i).Operator) & vbCrLf
+                tmpRules = tmpRules & "  IconCriteria(" & i & ")_Type: " & CondValTypeIntToString(cf.IconCriteria(i).Type) & vbCrLf
+                tmpRules = tmpRules & "  IconCriteria(" & i & ")_Value: " & cf.IconCriteria(i).Value & vbCrLf
+                tmpRules = tmpRules & "  IconCriteria(" & i & ")_Operator: " & OpIntToString(cf.IconCriteria(i).Operator) & vbCrLf
             Next i
         Else ' Not colorScale, not IconSet - everything else
-            If cf.Type = xlUniqueValues Then allRules = allRules & "  DupeUnique: " & cf.dupeUnique & vbCrLf
-            If cf.Type = xlTop10 Then allRules = allRules & "  TopBottom: " & cf.TopBottom & vbCrLf
-            If cf.Type = xlTop10 Then allRules = allRules & "  Rank: " & cf.Rank & vbCrLf
+            If cf.Type = xlUniqueValues Then tmpRules = tmpRules & "  DupeUnique: " & cf.dupeUnique & vbCrLf
+            If cf.Type = xlTop10 Then tmpRules = tmpRules & "  TopBottom: " & cf.TopBottom & vbCrLf
+            If cf.Type = xlTop10 Then tmpRules = tmpRules & "  Rank: " & cf.Rank & vbCrLf
             
-            If Not IsEmpty(cf.StopIfTrue) And cf.StopIfTrue Then allRules = allRules & "  StopIfTrue: " & cf.StopIfTrue & vbCrLf
-            If Not IsEmpty(cf.Percent) Then allRules = allRules & "  Percent: " & cf.Percent & vbCrLf
-            If Not IsEmpty(cf.Operator) Then allRules = allRules & "  Operator: " & OpIntToString(cf.Operator) & vbCrLf
-            If Not IsEmpty(cf.TextOperator) Then allRules = allRules & "  TextOperator: " & TxtOpIntToString(cf.TextOperator) & vbCrLf
-            If Not IsEmpty(cf.DateOperator) Then allRules = allRules & "  DateOperator: " & DateOpIntToString(cf.DateOperator) & vbCrLf
-            If Not IsEmpty(cf.Text) Then allRules = allRules & "  Text: " & cf.Text & vbCrLf
-            If Not IsEmpty(cf.formula1) Then allRules = allRules & "  Formula 1: " & cf.formula1 & vbCrLf
-            If Not IsEmpty(cf.Formula2) Then allRules = allRules & "  Formula 2: " & cf.Formula2 & vbCrLf
-            If cf.Interior.ColorIndex <> xlNone Then allRules = allRules & "  FillColor: " & cf.Interior.Color & vbCrLf
-            If cf.Font.ColorIndex <> xlNone Then allRules = allRules & "  FontColor: " & cf.Font.Color & vbCrLf
-            If cf.Font.Bold <> xlNone Then allRules = allRules & "  FontBold: " & cf.Font.Bold & vbCrLf
-            If cf.Font.Italic <> xlNone Then allRules = allRules & "  FontItalic: " & cf.Font.Italic & vbCrLf
+            If Not IsEmpty(cf.StopIfTrue) And cf.StopIfTrue Then tmpRules = tmpRules & "  StopIfTrue: " & cf.StopIfTrue & vbCrLf
+            If Not IsEmpty(cf.Percent) Then tmpRules = tmpRules & "  Percent: " & cf.Percent & vbCrLf
+            If Not IsEmpty(cf.Operator) Then tmpRules = tmpRules & "  Operator: " & OpIntToString(cf.Operator) & vbCrLf
+            If Not IsEmpty(cf.TextOperator) Then tmpRules = tmpRules & "  TextOperator: " & TxtOpIntToString(cf.TextOperator) & vbCrLf
+            If Not IsEmpty(cf.DateOperator) Then tmpRules = tmpRules & "  DateOperator: " & DateOpIntToString(cf.DateOperator) & vbCrLf
+            If Not IsEmpty(cf.Text) Then tmpRules = tmpRules & "  Text: " & cf.Text & vbCrLf
+            If Not IsEmpty(cf.formula1) Then
+                tmpRules = tmpRules & "  Formula 1: " & cf.formula1 & vbCrLf
+                tmpCols = cf.formula1
+            End If
+            If Not IsEmpty(cf.Formula2) Then
+                tmpRules = tmpRules & "  Formula 2: " & cf.Formula2 & vbCrLf
+                tmpCols = tmpCols & " " & cf.Formula2
+            End If
+            If cf.Interior.ColorIndex <> xlNone Then tmpRules = tmpRules & "  FillColor: " & cf.Interior.Color & vbCrLf
+            If cf.Font.ColorIndex <> xlNone Then tmpRules = tmpRules & "  FontColor: " & cf.Font.Color & vbCrLf
+            If cf.Font.Bold <> xlNone Then tmpRules = tmpRules & "  FontBold: " & cf.Font.Bold & vbCrLf
+            If cf.Font.Italic <> xlNone Then tmpRules = tmpRules & "  FontItalic: " & cf.Font.Italic & vbCrLf
+            
+            tmpCols = GetUniqueColumns(tmpCols)
             
             For i = 1 To cf.Borders.Count
                 With cf.Borders(i)
                     If Not IsEmpty(.LineStyle) And .LineStyle <> xlNone Then
-                        If Not IsEmpty(.Color) Then allRules = allRules & "  Borders.Color " & i & ": " & .Color & vbCrLf
-                        If Not IsEmpty(.LineSyle) Then allRules = allRules & "  Borders.LineStyle " & i & ": " & BorderStyleIntToString(.LineStyle) & vbCrLf
-                        'If Not IsEmpty(.Weight) Then allRules = allRules & "  Borders.Weight " & i & ": " & BorderWeightIntToString(.Weight) & vbCrLf ' No longer allowed to set border weight
+                        If Not IsEmpty(.Color) Then tmpRules = tmpRules & "  Borders.Color " & i & ": " & .Color & vbCrLf
+                        If Not IsEmpty(.LineSyle) Then tmpRules = tmpRules & "  Borders.LineStyle " & i & ": " & BorderStyleIntToString(.LineStyle) & vbCrLf
+                        'If Not IsEmpty(.Weight) Then tmpRules = tmpRules & "  Borders.Weight " & i & ": " & BorderWeightIntToString(.Weight) & vbCrLf ' No longer allowed to set border weight
                     End If
                 End With
             Next i
@@ -108,13 +105,38 @@ Sub SaveConditionalFormattingToString()
         'Else ' IS xlColorScale
 
         End If
-        If Not IsEmpty(cf.StopIfTrue) And cf.StopIfTrue Then allRules = allRules & "  StopIfTrue: " & cf.StopIfTrue & vbCrLf
+        If Not IsEmpty(cf.StopIfTrue) And cf.StopIfTrue Then tmpRules = tmpRules & "  StopIfTrue: " & cf.StopIfTrue & vbCrLf
         ' Excel default with manually created rules is to leave StopIfTrue unchecked (False).
         ' Based on an assumption about programmer's committment to efficiency, Excel's default for most programmatically created rules is to set StopIfTrue to True
         ' We, here, are setting it to False by default, unless the user manually sets it to True before saving.
         On Error GoTo 0
+
+        allRules = allRules & "Rule #" & ruleCount & ":" & vbCrLf
+        allRules = allRules & "  Applies To Address: " & cf.AppliesTo.Address & vbCrLf
         
-        allRules = allRules & vbCrLf
+        If intHdrRow > 0 Then
+            allColumns = "  AppliesTo Column(s):"
+            For Each intCol In cf.AppliesTo.Columns
+                stTmp = Cells(intHdrRow, intCol.Column).Value
+                If InStr(1, allColumns, " " & stTmp & ",") = 0 Then
+                    allColumns = allColumns & " " & Split(Cells(1, intCol.Column).Address, "$")(1) & "=" & Cells(intHdrRow, intCol.Column).Value & ","
+                End If
+            Next intCol
+            allRules = allRules & Left(allColumns, Len(allColumns) - 1) & vbCrLf
+            If tmpCols <> "" Then
+                allRules = allRules & "  Column(s) Examined:"
+                tmpColsArr = Split(tmpCols, ",")
+                For Each tmpCol In tmpColsArr
+                    tmpCol = Trim(tmpCol)
+                    allRules = allRules & " " & tmpCol & "=" & Cells(intHdrRow, 1).Range(tmpCol & "1").Value & ","
+                Next tmpCol
+                allRules = Left(allRules, Len(allRules) - 1) & vbCrLf
+            End If
+        End If
+
+
+        allRules = allRules & vbCrLf & "  Type ID: " & TypeIntToString(cf.Type) & vbCrLf
+        allRules = allRules & tmpRules & vbCrLf
     Next cf
     
     allRules = ruleCount & " Conditional Formatting Rules for tab: """ & ws.Name & """ Saved on " & Format(Now, "mm/dd/yyyy H:mm:ss") & vbCrLf & vbCrLf & allRules
@@ -317,7 +339,7 @@ Sub RecreateConditionalFormattingFromString()
         ruleCount = ruleCount + 1
     Next i
     
-    MsgBox ws.Cells.FormatConditions.Count & " rules successfully created out of " & UBound(ruleArray) & " specified in cell with Name """ & rngName & """", vbInformation
+    MsgBox ws.Cells.FormatConditions.Count & " rules successfully re-created out of " & UBound(ruleArray) & " specified in cell with Name """ & rngName & """", vbInformation
 End Sub
 
 Function ParseMyParm(singleRule As Variant, stV As String) As String
@@ -338,6 +360,59 @@ Function RangeExists(rngName As String) As Boolean
     RangeExists = False
     RangeExists = Len(ThisWorkbook.Names(rngName).Name) <> 0
 End Function
+
+Sub tempTestUC()
+    Dim stF As String: stF = ActiveCell.Value
+    Dim stR As String: stR = GetUniqueColumns(stF)
+    MsgBox (stR)
+    
+End Sub
+
+Function GetUniqueColumns(formulaText As String) As String
+    Dim regex As Object
+    Dim matches As Object, m As Object
+    Dim dict As Object
+    Dim colLetter As String
+    
+    ' Initialize Regex and Dictionary for unique values
+    Set regex = CreateObject("VBScript.RegExp")
+    Set dict = CreateObject("Scripting.Dictionary")
+    
+    With regex
+        .Global = True
+        .IgnoreCase = True
+        ' Pattern for A1-style references: Optional $, then letters, optional $, then numbers
+        .Pattern = "\$?[A-Z]+\$?\d+"
+    End With
+    
+    Set matches = regex.Execute(formulaText)
+    
+    For Each m In matches
+        ' Strip out $, numbers, and other characters to keep only letters
+        colLetter = UCase(m.Value)
+        colLetter = Replace(colLetter, "$", "")
+        colLetter = regex_OnlyLetters(colLetter)
+        
+        ' Add to dictionary to ensure uniqueness
+        If Not dict.Exists(colLetter) Then
+            dict.Add colLetter, colLetter
+        End If
+    Next m
+    
+    ' Join unique letters into a single string
+    GetUniqueColumns = Join(dict.Keys, ", ")
+End Function
+
+' Helper to strip numbers from the match
+Function regex_OnlyLetters(strInput As String) As String
+    Dim i As Integer
+    For i = 1 To Len(strInput)
+        If Not IsNumeric(Mid(strInput, i, 1)) Then
+            regex_OnlyLetters = regex_OnlyLetters & Mid(strInput, i, 1)
+        End If
+    Next i
+End Function
+
 
 Function TypeIntToString(intType As Long) As String
 ' https://www.google.com/search?q=excel+macro+Conditional+Formatting+type+integer+equivalents+for+xl+constants
