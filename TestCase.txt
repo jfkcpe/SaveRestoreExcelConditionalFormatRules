@@ -1,61 +1,92 @@
-19 Conditional Formatting Rules for tab: "WatchHistory" Saved on 01/30/2026 15:09:55
+15 Conditional Formatting Rules for tab: "WatchHistory" Saved on 03/16/2026 14:23:47
 
 Rule #1:
-Column(s) Affected: m/s
-  Applies To: $A$3
-  Type ID: xlNoErrorsCondition
-  StopIfTrue: True
-  Formula 1: =NOT(ISERROR(A3))
-  FillColor: 65280
-  FontColor: 12611584
-  StopIfTrue: True
+  Applies To Address: $C$2
+  AppliesTo Column(s): C=F
+  Column(s) Examined: C=F
+
+  Type ID: xlBlanksCondition
+  Formula 1: =LEN(TRIM(C2))=0
+  FillColor: 12566463
 
 Rule #2:
-Column(s) Affected: m/s
-  Applies To: $A$2
-  Type ID: xlErrorsCondition
-  Formula 1: =ISERROR(A2)
-  FillColor: 254
-  FontColor: 65535
+  Applies To Address: $I$2
+  AppliesTo Column(s): I=Start Year
+
+  Type ID: xlCellValue
+  Operator: xlBetween
+  Formula 1: =1923
+  Formula 2: =2000
+  FillColor: 14277081
+  FontColor: 13999631
+  FontBold: True
+  FontItalic: True
 
 Rule #3:
-Column(s) Affected: m/s
-  Applies To: $A$7
+  Applies To Address: $A$3
+  AppliesTo Column(s): A=m/s
+
   Type ID: xlCellValue
   Operator: xlEqual
   Formula 1: ="m"
-  FontColor: 255
-  Borders.Color 4: 255
-  Borders.LineStyle 4: xlDashDotDot
+  FillColor: 14024661
+  FontColor: 3057486
+  FontBold: True
+  FontItalic: False
 
 Rule #4:
-Column(s) Affected: Name
-  Applies To: $B:$B
-  Type ID: xlExpression
-  Formula 1: =AND(B1<>"",O1="")
-  FillColor: 65535
+  Applies To Address: $A$2
+  AppliesTo Column(s): A=m/s
+  Column(s) Examined: A=m/s
+
+  Type ID: xlErrorsCondition
+  Formula 1: =ISERROR(A2)
+  FillColor: 15198207
+  FontColor: 255
+  FontBold: True
+  FontItalic: True
 
 Rule #5:
-Column(s) Affected: Name
-  Applies To: $B$2:$B$1048576
+  Applies To Address: $X:$X
+  AppliesTo Column(s): X=MetaCriticLink
+  Column(s) Examined: X=MetaCriticLink
+
+  Type ID: xlExpression
+  Formula 1: =ISNUMBER(SEARCH("/search/", FORMULATEXT(X1)))
+  FillColor: 11272191
+
+Rule #6:
+  Applies To Address: $H:$H
+  AppliesTo Column(s): H=totalSeasons
+  Column(s) Examined: J=End Year
+
+  Type ID: xlExpression
+  Formula 1: =J1="–"
+  FillColor: 16704246
+
+Rule #7:
+  Applies To Address: $B:$B
+  AppliesTo Column(s): B=Name
+  Column(s) Examined: B=Name, T=IMDB ID
+
+  Type ID: xlExpression
+  Formula 1: =AND(B1<>"",T1="")
+  FillColor: 65535
+
+Rule #8:
+  Applies To Address: $B$2:$B$1048576
+  AppliesTo Column(s): B=Name
+  Column(s) Examined: B=Name
+
   Type ID: xlExpression
   Formula 1: =AND(B2<>"",B2=B3)
   FillColor: 16313082
   FontColor: 3305961
 
-Rule #6:
-Column(s) Affected: F
-  Applies To: $C$3
-  Type ID: xlCellValue
-  Operator: xlBetween
-  Formula 1: =1
-  Formula 2: =5
-  FillColor: 13463000
-  FontColor: 65535
+Rule #9:
+  Applies To Address: $E:$E
+  AppliesTo Column(s): E=R
 
-Rule #7:
-Column(s) Affected: R
-  Applies To: $E:$E
   Type ID: xlColorScale
   ColorScaleType: 3
   ColorScaleCriteriaType 1: xlConditionalValuePercentile
@@ -68,9 +99,10 @@ Column(s) Affected: R
   ScaleColor 3: 16769505
   ColorScaleCriteriaValue 3: 91
 
-Rule #8:
-Column(s) Affected: Start Year
-  Applies To: $H:$H
+Rule #10:
+  Applies To Address: $I:$I
+  AppliesTo Column(s): I=Start Year
+
   Type ID: xlIconSet
   IconSet_ID: xl4CRV
   IconCriteria(1)_Type: xlConditionValuePercent
@@ -86,50 +118,32 @@ Column(s) Affected: Start Year
   IconCriteria(4)_Value: 75
   IconCriteria(4)_Operator: xlGreaterEqual
 
-Rule #9:
-Column(s) Affected: Category
-  Applies To: $K:$K
+Rule #11:
+  Applies To Address: $N:$N
+  AppliesTo Column(s): N=Category
+  Column(s) Examined: N=Category
+
   Type ID: xlTextString
   TextOperator: xlContains
   Text: WWII
-  Formula 1: =NOT(ISERROR(SEARCH("WWII",K1)))
+  Formula 1: =NOT(ISERROR(SEARCH("WWII",N1)))
   FillColor: 15716082
   FontColor: 7348600
 
-Rule #10:
-Column(s) Affected: Category
-  Applies To: $K:$K
-  Type ID: xlBlanksCondition
-  Formula 1: =LEN(TRIM(K1))=0
-  FillColor: 16510410
-
-Rule #11:
-Column(s) Affected: Have DVD
-  Applies To: $L$2:$L$1048576
-  Type ID: xlNoBlanksCondition
-  Formula 1: =LEN(TRIM(L2))>0
-  FillColor: 16765424
-
 Rule #12:
-Column(s) Affected: IMDB ID
-  Applies To: $O$2:$O$1048576
+  Applies To Address: $T$2:$T$1048576
+  AppliesTo Column(s): T=IMDB ID
+  Column(s) Examined: T=IMDB ID
+
   Type ID: xlExpression
-  Formula 1: =OR(O2=O1,O2=O3)
+  Formula 1: =OR(T2=T1,T2=T3)
   FillColor: 14548991
   FontColor: 138
 
 Rule #13:
-Column(s) Affected: Title
-  Applies To: $S:$S
-  Type ID: xlTextString
-  TextOperator: xlBeginsWith
-  Text: the
-  Formula 1: =LEFT(S1,LEN("the"))="the"
-  FillColor: 13693658
+  Applies To Address: $V:$V
+  AppliesTo Column(s): V=Title
 
-Rule #14:
-Column(s) Affected: Title
-  Applies To: $S:$S
   Type ID: xlUniqueValues
   DupeUnique: 1
   FillColor: 13463000
@@ -137,18 +151,10 @@ Column(s) Affected: Title
   Borders.Color 5: 0
   Borders.Color 6: 0
 
-Rule #15:
-Column(s) Affected: Title
-  Applies To: $S:$S
-  Type ID: xlTextString
-  TextOperator: xlEndsWith
-  Text: n
-  Formula 1: =RIGHT(S1,LEN("n"))="n"
-  FillColor: 16510410
+Rule #14:
+  Applies To Address: $L:$L
+  AppliesTo Column(s): L=imdbRating
 
-Rule #16:
-Column(s) Affected: imdbRating
-  Applies To: $T:$T
   Type ID: xlTop10
   TopBottom: 1
   Rank: 25
@@ -157,32 +163,16 @@ Column(s) Affected: imdbRating
   Borders.Color 5: 0
   Borders.Color 6: 0
 
-Rule #17:
-Column(s) Affected: Metascore
-  Applies To: $U$2:$U$1048576
+Rule #15:
+  Applies To Address: $F$2:$F$1048576
+  AppliesTo Column(s): F=Metascore
+
   Type ID: xlColorScale
   ColorScaleType: 2
   ColorScaleCriteriaType 1: xlConditionalValueLowestValue
   ScaleColor 1: 13158655
-  ColorScaleCriteriaValue 1: 1.7
+  ColorScaleCriteriaValue 1: 0
   ColorScaleCriteriaType 2: xlConditionalValueHighestValue
   ScaleColor 2: 13172680
   ColorScaleCriteriaValue 2: 10
-
-Rule #18:
-Column(s) Affected: Rated
-  Applies To: $X:$X
-  Type ID: xlTextString
-  TextOperator: xlDoesNotContain
-  Text: t
-  Formula 1: =ISERROR(SEARCH("t",X1))
-  FillColor: 13693658
-
-Rule #19:
-Column(s) Affected: Updated
-  Applies To: $AH:$AH
-  Type ID: xlTimePeriod
-  DateOperator: xlLastWeek
-  Formula 1: =AND(TODAY()-FLOOR(AH1,1)<=6,FLOOR(AH1,1)<=TODAY())
-  FillColor: 13168833
 
